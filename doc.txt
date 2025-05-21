@@ -1,0 +1,139 @@
+                    Network Jetpack Protocol (NJP)
+                    and Map Format Specification v1.0
+
+
+Abstract
+
+   This document defines the custom application-layer protocol named
+   NJP (Network Jetpack Protocol), used in the Jetpack multiplayer
+   game server. It also specifies the text-based format for maps
+   loaded by the server, including the symbol semantics and grid layout.
+
+
+Table of Contents
+
+   1. Introduction ..................................................
+   2. Protocol Overview .............................................
+   3. Message Formats ...............................................
+   4. Map Format Specification ......................................
+   5. Examples ......................................................
+   6. Author's Address ..............................................
+
+
+1. Introduction
+---------------
+
+   This document defines the protocol used between clients and the Jetpack
+   server. It is designed to manage a simple multiplayer session where each
+   player can move, collect coins, and toggle their jetpack on or off.
+
+
+2. Protocol Overview
+--------------------
+
+   The NJP protocol is a plain-text, line-based protocol using TCP sockets.
+   Each message is a string terminated by a newline character (\n). Commands
+   are typically sent by clients and responded to by the server. All keywords
+   are uppercase and may be followed by arguments separated by spaces.
+
+
+3. Message Formats
+------------------
+
+   This section lists and explains the available messages exchanged over the
+   network.
+
+   - ID <id>
+     Sent by the server to identify the client.
+
+   - POS <id> <x> <y>
+     Sent by the server to update the position of a player id.
+
+   - JETPACK_ON
+     Sent by the client to activate the jetpack.
+
+   - JETPACK_OFF
+     Sent by the client to deactivate the jetpack.
+
+   - COIN <x> <y>
+     Sent by the server to indicate that a coin located at coordinates (x, y)
+     has been collected.
+
+   - OBJ <type> <x> <y>
+     Sent by the server to describe an object in the map (e.g. fireball).
+
+   - SCORE <value>
+     Sent by the server to update the player's score.
+
+   - DEAD <id>
+     Sent by the server when a player_id dies.
+
+   - WIN
+     Sent by the server when a player win.
+
+   - LOOSE
+     Sent by the server when a player loose.
+
+   - STOP
+     Sent by the server when a game stop.
+
+   - START
+     Sent by the server when a game start.
+
+   All messages are ASCII-only and case-sensitive. Updates are sent at a rate
+   of 60 times per second, following the main game loop and event triggers.
+
+
+4. Map Format Specification
+---------------------------
+
+   The map is a plain text file where each character represents a tile in
+   a 2D grid. Each line in the file represents a row (Y axis) in the game
+   world. The map must contain a maximum of 10 lines.
+
+   Accepted characters:
+     - '_' : Empty space (walkable tile)
+     - 'e' : Fireball (deadly obstacle)
+     - 'c' : Coin (collectible item)
+
+   The world position is calculated as follows:
+     X = character index * 100
+     Y = line number * 97
+
+   The map is treated as a rectangular grid. The length of the longest
+   line defines the total width of the map. Shorter lines are implicitly
+   padded with empty spaces.
+
+
+5. Examples
+-----------
+
+   Example client/server exchange:
+
+     Client: JETPACK_ON
+     Server: POS 1 320 194
+     Server: COIN 400 194
+     Server: SCORE 10
+
+   Example map file:
+
+    "____________________________e____________________________"
+    "____________________________e______cccccc________________"
+    "____________________________e_____ccccccc________________"
+    "____________________________e____cc______________________"
+    "____________________________e___cc______e________________"
+    "_______________________________cc_______e________________"
+    "_________________________ccccccc________e________________"
+    "_________________________cccccc_________e________________"
+    "________________________________________e________________"
+    "________________________________________e________________"
+
+   This represents a map with fireball and coin
+
+
+6. Author's Address
+-------------------
+
+   Corentin Pierrat, email: corentin.pierrat@epitech.eu
+   Elias Wach, email: elias.wach@epitech.eu
+   Theotime Collier, email: theotime.collier@epitech.eu
